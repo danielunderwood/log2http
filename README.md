@@ -5,10 +5,17 @@ Matches log lines to trigger HTTP requests. A super hacky alternative to ELK or 
 ## Supported HTTP Targets
 - Discord
 
+## Caveats
+
+At the moment, the following edge cases apply:
+- There is no knowledge of what lines trigger requests, so requests could be duplicated upon restart
+- There is no retry mechanism, so failed webhooks will not be retried
+
 ## Usage
 
 ### Docker
-Really you probably want to use docker-compose or some other system to manage configuration (ansible, k8s manifests, etc), but this should get you started.
+A docker image is available at ghcr.io/danielunderwood/log2http. Really you probably want to use
+docker-compose or some other system to manage configuration (ansible, k8s manifests, etc), but this should get you started.
 
 ```shell
 $ docker run -d \
@@ -18,7 +25,10 @@ $ docker run -d \
     ghcr.io/danielunderwood/log2http -file /log/whatever.log -sourceName "$(hostname)/docker" -regexp "a|b"
 ```
 
-### Binary (Coming Soon?)
+### Binary
+
+Binaries for most major OS (Linux/MacOS/Windows/BSD) and architecture (x64/arm/arm64) are available under
+[releases](https://github.com/danielunderwood/log2http/releases).
 
 ```shell
 $ log2http -file FILENAME -regexp "^[Rr]egex$" -url https://discordapp.com/...
