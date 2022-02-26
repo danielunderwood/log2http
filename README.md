@@ -15,16 +15,16 @@ $ docker run -d \
     -v $LOG_DIR:/logs \
     -e URL=https://example.com/... \
     --name log2http \
-    ghcr.io/danielunderwood/log2http -file /log/whatever.log -sourceName "$(hostname)/docker"
+    ghcr.io/danielunderwood/log2http -file /log/whatever.log -sourceName "$(hostname)/docker" -regexp "a|b"
 ```
 
 ### Binary (Coming Soon?)
 
 ```shell
-$ log2http -file FILENAME -expression "^[Rr]egex$" -url https://discordapp.com/...
+$ log2http -file FILENAME -regexp "^[Rr]egex$" -url https://discordapp.com/...
 $ # Or supply URL via environment
 $ export URL="https://discordapp.com/..."
-$ log2http -file FILENAME -expression "^[Rr]egex$
+$ log2http -file FILENAME -regexp "^[Rr]egex$
 ```
 
 ## Development
