@@ -65,11 +65,12 @@ func main() {
 				"application/json",
 				bytes.NewReader(body),
 			)
-			defer resp.Body.Close()
+
 			if err != nil {
 				fmt.Println("ERROR", err)
 				continue
 			}
+
 			if resp.StatusCode != 204 {
 				body, _ := ioutil.ReadAll(resp.Body)
 				fmt.Println("Request failed", resp.StatusCode, string(body))
