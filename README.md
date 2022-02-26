@@ -7,7 +7,18 @@ Matches log lines to trigger HTTP requests. A super hacky alternative to ELK or 
 
 ## Usage
 
-### Binary
+### Docker
+Really you probably want to use docker-compose or some other system to manage configuration (ansible, k8s manifests, etc), but this should get you started.
+
+```shell
+$ docker run -d \
+    -v $LOG_DIR:/logs \
+    -e URL=https://example.com/... \
+    --name log2http \
+    ghcr.io/danielunderwood/log2http -file /log/whatever.log -sourceName "$(hostname)/docker"
+```
+
+### Binary (Coming Soon?)
 
 ```shell
 $ log2http -file FILENAME -expression "^[Rr]egex$" -url https://discordapp.com/...
