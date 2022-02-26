@@ -18,10 +18,11 @@ type DiscordMessage struct {
 }
 
 func main() {
-	var file, expression, url string
+	var file, expression, url, sourceName string
 	flag.StringVar(&file, "file", "", "File to read. Required")
 	flag.StringVar(&url, "url", "", "URL to POST to. Must be supplied or in environment")
 	flag.StringVar(&expression, "regexp", ".*", "Expression to match, defaults to `.*`")
+	flag.StringVar(&sourceName, "sourceName", "", "Name of source. Defaults to hostname")
 
 	flag.Parse()
 
@@ -36,6 +37,9 @@ func main() {
 		fmt.Println("ERROR: URL must be supplied as -url or in URL environment")
 		os.Exit(1)
 	}
+	if len(sourceName) == 0 {
+		sourceName, _ = os.Hostname()
+	}
 
 	t, err := tail.TailFile(file, tail.Config{Follow: true})
 	if err != nil {
@@ -49,13 +53,13 @@ func main() {
 		}
 		if matched {
 			fmt.Println("Matched", line.Text)
-			message := DiscordMessage{Content: fmt.Sprintf("[%s] matched line: %s", file, line.Text)}
+			message := DiscordMessage{Content: fmt.Sprintf("[%s][%s] matched line: %s", sourceName, file, line.Text)}
 			body, err := json.Marshal(message)
 			if err != nil {
 				fmt.Print("Failed to marshal JSON", err)
 				continue
 			}
-			// TODO This should be an option
+
 			resp, err := http.Post(
 				url,
 				"application/json",
