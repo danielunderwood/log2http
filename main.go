@@ -41,7 +41,7 @@ func main() {
 		sourceName, _ = os.Hostname()
 	}
 
-	t, err := tail.TailFile(file, tail.Config{Follow: true})
+	t, err := tail.TailFile(file, tail.Config{Follow: true, ReOpen: true, Poll: true})
 	if err != nil {
 		panic(err)
 	}
