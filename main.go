@@ -10,7 +10,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/hpcloud/tail"
+	"github.com/nxadm/tail"
 )
 
 type DiscordMessage struct {
