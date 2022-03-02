@@ -13,8 +13,31 @@ import (
 	"github.com/nxadm/tail"
 )
 
+type Author struct {
+	Name string `json:"name"`
+}
+
+type Provider struct {
+	Name string `json:"name"`
+}
+
+type Field struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// https://discord.com/developers/docs/resources/channel#embed-object
+type Embed struct {
+	Title       string   `json:"title,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Author      Author   `json:"author,omitempty"`
+	Provider    Provider `json:"provider,omitempty"`
+	Fields      []Field  `json:"fields,omitempty"`
+}
+
 type DiscordMessage struct {
-	Content string `json:"content"`
+	Content string  `json:"content,omitempty"`
+	Embeds  []Embed `json:"embeds,omitempty"`
 }
 
 func main() {
@@ -41,11 +64,18 @@ func main() {
 		sourceName, _ = os.Hostname()
 	}
 
+	re := regexp.MustCompile(expression)
+
 	t, err := tail.TailFile(file, tail.Config{Follow: true, ReOpen: true, Poll: true})
 	if err != nil {
 		panic(err)
 	}
 	for line := range t.Lines {
+
+		fields := make([]Field, 2)
+		fields = append(fields, Field{Name: "source", Value: sourceName})
+		fields = append(fields, Field{Name: "file", Value: file})
+
 		matched, err := regexp.MatchString(expression, line.Text)
 		if err != nil {
 			fmt.Println("ERROR", err)
@@ -53,7 +83,14 @@ func main() {
 		}
 		if matched {
 			fmt.Println("Matched", line.Text)
-			message := DiscordMessage{Content: fmt.Sprintf("[%s][%s] matched line: %s", sourceName, file, line.Text)}
+			message := DiscordMessage{
+				Embeds: []Embed{
+					Embed{
+						Author:      Author{Name: fmt.Sprintf("%s on %s", file, sourceName)},
+						Description: fmt.Sprintf("```\n%s\n```", line.Text),
+						Fields:      fields,
+					},
+				}}
 			body, err := json.Marshal(message)
 			if err != nil {
 				fmt.Print("Failed to marshal JSON", err)
