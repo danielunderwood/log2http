@@ -72,16 +72,28 @@ func main() {
 	}
 	for line := range t.Lines {
 
-		fields := make([]Field, 2)
+		fields := make([]Field, 0, len(re.SubexpNames())+2)
 		fields = append(fields, Field{Name: "source", Value: sourceName})
 		fields = append(fields, Field{Name: "file", Value: file})
 
-		matched, err := regexp.MatchString(expression, line.Text)
+		// This allows to use groups within the regex to find things like
+		// nix run .#log2http -- -file fakefile -regexp '(?P<host>\w+) sshd\[\d+\]: Accepted publickey for (?P<user>\w+) from (?P<source>[\d\.]+)'
+		// and use them as fields
+		match := re.FindStringSubmatch(line.Text)
+		if len(match) == 0 {
+			continue
+		}
+		for i, name := range re.SubexpNames() {
+			if i != 0 && name != "" {
+				fields = append(fields, Field{Name: name, Value: match[i]})
+			}
+		}
+
 		if err != nil {
 			fmt.Println("ERROR", err)
 			continue
 		}
-		if matched {
+		if len(match) > 0 {
 			fmt.Println("Matched", line.Text)
 			message := DiscordMessage{
 				Embeds: []Embed{
