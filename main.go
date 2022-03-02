@@ -1,12 +1,8 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"regexp"
 
@@ -38,6 +34,9 @@ func main() {
 	}
 
 	re := regexp.MustCompile(expression)
+
+	client := NewDiscordWebhook(url)
+	defer client.Close()
 
 	t, err := tail.TailFile(file, tail.Config{Follow: true, ReOpen: true, Poll: true})
 	if err != nil {
@@ -76,27 +75,7 @@ func main() {
 						Fields:      fields,
 					},
 				}}
-			body, err := json.Marshal(message)
-			if err != nil {
-				fmt.Print("Failed to marshal JSON", err)
-				continue
-			}
-
-			resp, err := http.Post(
-				url,
-				"application/json",
-				bytes.NewReader(body),
-			)
-
-			if err != nil {
-				fmt.Println("ERROR", err)
-				continue
-			}
-
-			if resp.StatusCode != 204 {
-				body, _ := ioutil.ReadAll(resp.Body)
-				fmt.Println("Request failed", resp.StatusCode, string(body))
-			}
+			client.MessageQueue <- message
 		}
 	}
 }
