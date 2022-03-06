@@ -57,7 +57,7 @@ func main() {
 		}
 		for i, name := range re.SubexpNames() {
 			if i != 0 && name != "" {
-				fields = append(fields, Field{Name: name, Value: match[i]})
+				fields = append(fields, Field{Name: name, Value: match[i], Inline: true})
 			}
 		}
 
