@@ -41,7 +41,7 @@ func main() {
 		dedupe = NewNullDeduplicator()
 	} else if strings.HasPrefix(dedupeUri, "bloom://") {
 		// TODO These parameters should probably be tunable by the user
-		dedupe = NewBloomFilterDeduplicator(dedupeUri[len("bloom://"):], 1e9, 1e-4)
+		dedupe = NewBloomFilterDeduplicator(dedupeUri[len("bloom://"):], 10000, 0.01)
 	} else {
 		fmt.Println("ERROR: Unable to parse deduplication URI")
 		os.Exit(1)
