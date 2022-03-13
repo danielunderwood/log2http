@@ -4,7 +4,13 @@
   # Nixpkgs / NixOS version to use.
   inputs.nixpkgs.url = "nixpkgs/nixos-21.11";
 
-  outputs = { self, nixpkgs }:
+  # flake-compat for default.nix compatibility
+  inputs.flake-compat = {
+    url = github:edolstra/flake-compat;
+    flake = false;
+  };
+
+  outputs = { self, nixpkgs, flake-compat }:
     let
 
       # Generate a user-friendly version number.
